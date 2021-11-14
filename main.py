@@ -11,7 +11,7 @@ pin = machine.Pin(2, machine.Pin.OUT)
 
 dev={
     "scanning":False,
-    "last": 0,
+    "last_received_time": 0
     }
 
 def bt_irq(event, data):
@@ -27,8 +27,8 @@ def bt_irq(event, data):
         # Check that data is from one of our cameras and a version that 
         if ad_type != 0xFF or man_id != 0x1212 or version != 0x01:
             return
-        print("======")
-        print(ubinascii.hexlify(adv_data))
+        #print("======")
+        #print(ubinascii.hexlify(adv_data))
         
         # Check the CRC of the data
         crc = int.from_bytes(adv_data[-4:], 'big')
@@ -51,6 +51,7 @@ def process_data(device_id, data_type, data):
     print("Device ID:", device_id)
     print("Data type:", data_type)
     print("Data:", ubinascii.hexlify(data))
+    dev["last_received_time"] = time.ticks_ms()
 
 ble = bluetooth.BLE()
 while True:
@@ -59,6 +60,5 @@ while True:
     dev["scanning"] = True
     ble.gap_scan(3000, 30000, 30000)
     while dev["scanning"]:
-        #if dev["last"] > time.ticks_ms():
-        pin.value(dev["last"] > time.ticks_ms())
+        pin.value(dev["last_received_time"] > time.ticks_ms()- 5000)
         time.sleep(0.2)
