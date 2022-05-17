@@ -70,17 +70,16 @@ def process_data(device_id, data_type, data):
     elif data_type == classification_type:
         handle_classification(data)
 
-
-
-
 def handle_classification(classifications):
+    class_len=int(classifications[0])
+    print("No of classifications: ",class_len)
     top_pick = labels[int(classifications[1])]
     top_confidence = int(classifications[2])
-    second_pick = labels[int(classifications[3])]
-    second_confidence = int(classifications[4])
     print("1:", top_pick, " ", top_confidence, "%")
-    print("2:", second_pick, " ", second_confidence, "%")
-
+    if class_len>1:
+        second_pick = labels[int(classifications[3])]
+        second_confidence = int(classifications[4])
+        print("2:", second_pick, " ", second_confidence, "%")
 
 print("starting")
 ble = bluetooth.BLE()
